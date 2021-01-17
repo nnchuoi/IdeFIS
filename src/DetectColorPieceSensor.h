@@ -27,6 +27,7 @@ class DetectColorPieceSensor {
 
       colorResult=colorsensor0.ColorIdentify();
 
+      /* on avance pas à pas tant qu'on détecte pas une pièce */
       while(colorResult!=RED && colorResult!=GREEN){
         Serial.println(GREEN);
         Serial.println("ok");

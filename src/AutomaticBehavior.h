@@ -37,7 +37,7 @@ class AutomaticBehavior
       sensorColorPiece=scp;
     };
 
-    void turnLeft(){
+    void turnLeft90(){
       fork->middleFork();
       delay(10);
       double initialPosition;
@@ -122,30 +122,25 @@ class AutomaticBehavior
       uint8_t color=0;
       bool detectColor=false;
       uint8_t detectedColor;
-
-
-      /*rajouter un moyen d'arreter le robot pour qu'il ne prenne pas le mur la prise de pièces*/
+      uint8_t piecesTaken=0;
 
       while(1){
-        
         lineFollower->followLine();
-        bool piece=ultraSonicSensor->DetectPiece(5);
+        bool piece=ultraSonicSensor->DetectPiece(5); //on détecte une pièce
         Serial.println(piece);
         if (piece==true){
           Serial.println("piece");
+          /*on met le capteur couleur à l'avant en position*/
           fork->colorPosition();
-          color=sensorColorPiece->detectColor();
+          color=sensorColorPiece->detectColor();//on défini la couleur couleur principale avant le première prise
 
           Serial.println(color);
           while(color!=detectedColor && detectColor==true){
-
             color=sensorColorPiece->detectColor();
-
-
-
           }
+
           detectedColor=color;
-          detectColor=true;
+          detectColor=true;//la couleur a été définie
           Serial.println(detectedColor);
           robot->forward(-35);
           delay(2000);
@@ -154,10 +149,14 @@ class AutomaticBehavior
           delay(650);
           fork->upFork();
 
-
-
         }
       }
+
+
+      //Serial3.println(couleur+nb)
+      robot->forward(-SPEED_FORWARD_MAX);
+      delay(1000);
+      robot->forward(0);
     }
 
 

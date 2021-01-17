@@ -32,7 +32,6 @@ class Controlrobot
 
       void rotate(int rSpeed){
           rotationSpeed=rSpeed;
-          Serial.println(rSpeed);
           if (rSpeed>0){
             _motorLeft.run(rSpeed);
             _motorRight.run(rSpeed);
@@ -44,6 +43,16 @@ class Controlrobot
             _motorRight.run(rightSpeed);
           }
       }
+
+      void left(int rSpeed){
+        rotate(-rSpeed);
+      }
+
+      void right(int rSpeed){
+        rotate(rSpeed);
+      }
+
+
 
     int getLeftSpeed(){
       return leftSpeed;

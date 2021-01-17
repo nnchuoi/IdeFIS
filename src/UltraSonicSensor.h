@@ -53,8 +53,6 @@ class UltraSonicSensor
     }
 
 
-
-
 };
 
 #endif

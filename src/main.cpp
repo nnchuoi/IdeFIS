@@ -73,23 +73,24 @@ void setup(){
   Serial3.begin(115200);
   Serial.begin(9600);
 
-  //gyro.begin();
+  gyro.begin();
   //colorsensor0.SensorInit();
 
-  //delay(2000);
+  delay(2000);
   //robot.forward(80);
   //time1=millis();
   //fork.downFork();
   //delay(1000);
-  //fork.upFork();
-  //fork.middleFork();
+  fork.upFork();
+  fork.middleFork();
+  fork.upFork();
 }
 
 
 /********************start of the loop************************/
 void loop(){
 
-
+  /*
   //-------------------------Read serial-------------------
 
   if(Serial3.available()){
@@ -197,5 +198,8 @@ switch (mode){
  }
 
  delay(10);
+ */
+ automaticBehavior.takePiecesSameColor();
+ delay(20000);
 
 }

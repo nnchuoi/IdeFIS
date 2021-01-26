@@ -37,8 +37,10 @@ class UltraSonicSensor
 
         detectPieceInitialTime=millis();
         detectPieceTime=0;
+        
 
         if (ultraSensor.distanceCm()<=distance){
+
           robot->forward(0);
           Serial.println("capte");
 

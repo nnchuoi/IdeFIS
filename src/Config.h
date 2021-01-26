@@ -12,8 +12,8 @@
 
 /*----Position gyroscope------*/
 #define FORK_UP -30.0
-#define FORK_DOWN 18.0
-#define FORK_COLOR_SENSOR -31
+#define FORK_DOWN 20
+#define FORK_COLOR_SENSOR -32.5
 
 
 
@@ -21,8 +21,10 @@
 
 /*----Speed motors-------------*/
 
- #define SPEED_FORK_UP 30
- #define SPEED_FORK_DOWN -30
+ #define SPEED_FORK_UP 20
+ #define SPEED_FORK_DOWN -20
+
+
 
  #define SPEED_FORWARD_MAX 40
 

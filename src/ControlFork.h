@@ -95,13 +95,13 @@ class ControlFork
       Serial.println(gy);
 
 
-      while(gy<(FORK_COLOR_SENSOR-1)){
+      while(gy<(FORK_COLOR_SENSOR)){
         motorFork.run(-50);
         delay(10);
         gyroscope->update();
         gy=gyroscope->getAngleY();
       }
-      while(gy>(FORK_COLOR_SENSOR+1)){
+      while(gy>(FORK_COLOR_SENSOR)){
         motorFork.run(50);
         delay(10);
         gyroscope->update();

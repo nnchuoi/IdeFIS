@@ -166,11 +166,12 @@ class AutomaticBehavior
 
         lineFollower->followLine();
 
-        bool piece=ultraSonicSensor->DetectPiece(7); //on détecte une pièce
+        bool piece=ultraSonicSensor->DetectPiece(8); //on détecte une pièce
         // Serial.println(piece);
         if (piece==true){
           Serial.println("piece");
           /*on met le capteur couleur à l'avant en position*/
+          delay(100);
           fork->colorPosition();
           color=sensorColorPiece->detectColor();//on défini la couleur couleur principale avant le première prise
 
@@ -186,8 +187,11 @@ class AutomaticBehavior
           delay(2000);
           fork->downFork();
           robot->forward(35);
-          delay(650);
+          delay(580);
           fork->upFork();
+          robot->forward(-35);
+          delay(2000);
+          robot->forward(0);
 
         }
       }

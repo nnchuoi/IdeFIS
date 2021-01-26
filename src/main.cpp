@@ -81,8 +81,11 @@ void setup(){
   //time1=millis();
   //fork.downFork();
   //delay(1000);
+  delay(1000);
   fork.upFork();
+  delay(1000);
   fork.middleFork();
+  delay(1000);
   fork.upFork();
 }
 

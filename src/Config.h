@@ -12,7 +12,7 @@
 
 /*----Position gyroscope------*/
 #define FORK_UP -30.0
-#define FORK_DOWN 20
+#define FORK_DOWN 21
 #define FORK_COLOR_SENSOR -32.5
 
 

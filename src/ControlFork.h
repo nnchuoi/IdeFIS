@@ -14,7 +14,27 @@
 class ControlFork
 {
   private:
-    double error, prev_error, sum_error, d_error;
+    double error, prev_error, sum_error, d_error, res;
+    double mu_error[10];
+    int last = 0;
+    double mm=0;
+    void meanSmooth(double sample, boolean reset){
+        if(reset){
+            for (int i = 0; i < 8; ++i) {
+                mu_error[i] = 0;
+            }
+            last = 7;
+            mm = 0;
+        }
+        mm = mm + sample - mu_error[last];
+        mu_error[last] = sample;
+        last++;
+        if(last == 8){
+            last = 0;
+        }
+
+
+    }
   public :
       Controlrobot *robot;
       MeMegaPiDCMotor motorFork;
@@ -31,24 +51,31 @@ class ControlFork
 
     /* position up*/
     void upFork(){
-      double KP=1,KI=0.1,KD=0.5;
+      double KP=15,KI=3,KD=0;
       robot->forward(0);
       gyroscope->update();
       Serial.read();
       gy=gyroscope->getAngleY();
       Serial.println("okok");
+      error = gy - FORK_UP;
       prev_error = 0.0;
+      meanSmooth(error, true);
 
-      while(error !=0){
+      while((mm>0.01 || mm<-0.01) || (error >0.02 || error < -0.02)){
         error = gy - FORK_UP;
+        meanSmooth(error, false);
+        Serial.println(error);
+        Serial.println(mm);
         sum_error += error;
-        sum_error = min(sum_error, 50);
-        sum_error = max(sum_error, -50);
+        sum_error = min(sum_error, 20);
+        sum_error = max(sum_error, -20);
         d_error = error - prev_error;
         prev_error = error;
-
-        motorFork.run(KP*error + KI * sum_error + KD*d_error);
-        delay(100);
+        res = KP*error + KI * sum_error + KD*d_error;
+        res = min(res, 80);
+        res = max(res, -80);
+        motorFork.run(res);
+        delay(10);
         gyroscope->update();
         Serial.read();
         gy=gyroscope->getAngleY();
@@ -59,40 +86,69 @@ class ControlFork
 
     /* position to take the piece*/
     void downFork(){
-      robot->forward(0);
-      gyroscope->update();
-      Serial.read();
-      gy=gyroscope->getAngleY();
-      while(gy<FORK_DOWN){
-        motorFork.run(SPEED_FORK_DOWN);
-        delay(100);
+        double KP=15,KI=3,KD=0;
+        robot->forward(0);
         gyroscope->update();
         Serial.read();
         gy=gyroscope->getAngleY();
-      }
+        Serial.println("okok");
+        error = gy - FORK_DOWN;
+        prev_error = 0.0;
+        meanSmooth(error, true);
+
+        while((mm>0.01 || mm<-0.01) || (error >0.02 || error < -0.02)){
+            error = gy - FORK_DOWN;
+            meanSmooth(error, false);
+            Serial.println(error);
+            Serial.println(mm);
+            sum_error += error;
+            sum_error = min(sum_error, 20);
+            sum_error = max(sum_error, -20);
+            d_error = error - prev_error;
+            prev_error = error;
+            res = KP*error + KI * sum_error + KD*d_error;
+            res = min(res, 80);
+            res = max(res, -80);
+            motorFork.run(res);
+            delay(10);
+            gyroscope->update();
+            Serial.read();
+            gy=gyroscope->getAngleY();
+        }
       motorFork.run(0);
     }
 
     /* gyroscope horizontal*/
     void middleFork(){
-      robot->forward(0);
-      gyroscope->update();
-      gy=gyroscope->getAngleY();
-      Serial.println(gy);
-
-
-      while(gy<-1){
-        motorFork.run(SPEED_FORK_DOWN);
-        delay(10);
+        double KP=15,KI=3,KD=0;
+        robot->forward(0);
         gyroscope->update();
+        Serial.read();
         gy=gyroscope->getAngleY();
-      }
-      while(gy>1){
-        motorFork.run(SPEED_FORK_UP);
-        delay(10);
-        gyroscope->update();
-        gy=gyroscope->getAngleY();
-      }
+        Serial.println("okok");
+        error = gy - 0;
+        prev_error = 0.0;
+        meanSmooth(error, true);
+
+        while((mm>0.01 || mm<-0.01) || (error >0.02 || error < -0.02)){
+            error = gy - 0;
+            meanSmooth(error, false);
+            Serial.println(error);
+            Serial.println(mm);
+            sum_error += error;
+            sum_error = min(sum_error, 20);
+            sum_error = max(sum_error, -20);
+            d_error = error - prev_error;
+            prev_error = error;
+            res = KP*error + KI * sum_error + KD*d_error;
+            res = min(res, 80);
+            res = max(res, -80);
+            motorFork.run(res);
+            delay(10);
+            gyroscope->update();
+            Serial.read();
+            gy=gyroscope->getAngleY();
+        }
 
       motorFork.run(0);
     }

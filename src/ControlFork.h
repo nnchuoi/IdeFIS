@@ -3,8 +3,7 @@
 
 #include "MeMegaPi.h"
 #include "Controlrobot.h"
-#include "automaticBehavior.h"
-
+#include "AutomaticBehavior.h"
 
 #include "Config.h"
 
@@ -14,6 +13,8 @@
 
 class ControlFork
 {
+  private:
+    double error, prev_error, sum_error, d_error;
   public :
       Controlrobot *robot;
       MeMegaPiDCMotor motorFork;
@@ -30,13 +31,23 @@ class ControlFork
 
     /* position up*/
     void upFork(){
+      double KP=1,KI=0.1,KD=0.5;
       robot->forward(0);
       gyroscope->update();
       Serial.read();
       gy=gyroscope->getAngleY();
       Serial.println("okok");
-      while(gy>FORK_UP){
-        motorFork.run(SPEED_FORK_UP);
+      prev_error = 0.0;
+
+      while(error !=0){
+        error = gy - FORK_UP;
+        sum_error += error;
+        sum_error = min(sum_error, 50);
+        sum_error = max(sum_error, -50);
+        d_error = error - prev_error;
+        prev_error = error;
+
+        motorFork.run(KP*error + KI * sum_error + KD*d_error);
         delay(100);
         gyroscope->update();
         Serial.read();

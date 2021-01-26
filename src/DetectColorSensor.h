@@ -3,7 +3,7 @@
 
 #include "MeMegaPi.h"
 #include "Controlrobot.h"
-#include "automaticBehavior.h"
+#include "AutomaticBehavior.h"
 
 
 

@@ -50,7 +50,7 @@
  *    22. void MeColorSensor::TurnOffmodule(void);
  *    23. void MeColorSensor::TurnOnmodule(void);
  *    24. uint8_t MeColorSensor::ColorDataReadOnebyOne();
- * 
+ *
  * \par History:
  * <pre>
  * `<Author>`         `<Time>`        `<Version>`        `<Descr>`
@@ -131,6 +131,7 @@ typedef enum
   BLACK = 9,
   GOLD  = 10,
   BROWN = 11,
+  COLOR = 12,
 }COLORTYPES;
 
 /*
@@ -207,7 +208,7 @@ public:
  *   You can check the bh1745 datasheet for the registor address.
  */
   void SensorInit(void);
- 
+
 /**
  * \par Function
  *   ReportId
@@ -271,7 +272,7 @@ public:
  *   None
  */
  long ReturnColorCode(void);
- 
+
 /**
  * \par Function
  *   ColorIdentify
@@ -288,6 +289,7 @@ public:
  */
  uint8_t ColorIdentify(void);
 
+ uint8_t IdeFISColor(void);
 /**
  * \par Function
  *   Returnresult
@@ -317,7 +319,7 @@ public:
  *   None
  * \par Others
  * Gray = R*0.299 + G*0.587 + B*0.114
- * Gray = (r*38 + g*75 + b*15)>>7;  
+ * Gray = (r*38 + g*75 + b*15)>>7;
  */
  uint8_t ReturnGrayscale(void);
 
@@ -416,7 +418,7 @@ uint16_t ReturnRedData(void);
  *   None
  */
   void TurnOnLight(void);
- 
+
 /**
  * \par Function
  *  TurnOffLight
@@ -448,7 +450,7 @@ uint16_t ReturnRedData(void);
  *   None
  */
   void TurnOffmodule(void);
- 
+
 /**
  * \par Function
  *  TurnOnmodule
@@ -548,7 +550,7 @@ uint16_t ReturnRedData(void);
  * \par Description
  *   find the max one from r g b.
  * \param[in]
- *  r g b  
+ *  r g b
  * \par Output
  *   None
  * \return
@@ -563,7 +565,7 @@ uint16_t ReturnRedData(void);
  * \par Description
  *   find the min one from r g b.
  * \param[in]
- *  r g b  
+ *  r g b
  * \par Output
  *   None
  * \return
@@ -586,4 +588,3 @@ private:
   uint16_t Colorvalue;
 };
 #endif
-

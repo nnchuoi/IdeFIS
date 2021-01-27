@@ -1,4 +1,4 @@
-		/**
+/**
  * \par Copyright (C), 2012-2017, MakeBlock
  * \class   MeColorSensor
  * \brief   Driver for MeColorSensor module.
@@ -50,7 +50,7 @@
  *    22. void MeColorSensor::TurnOffmodule(void);
  *    23. void MeColorSensor::TurnOnmodule(void);
  *    24. uint8_t MeColorSensor::ColorDataReadOnebyOne();
- *    
+ *
  * \par History:
  * <pre>
  * `<Author>`         `<Time>`        `<Version>`        `<Descr>`
@@ -254,15 +254,15 @@ long MeColorSensor::ReturnColorCode(void)
   r = Redvalue / 20;
   g = Greenvalue / 30;
   b = Bluevalue / 20;
-  if(r>255) 
+  if(r>255)
   {
     r=255;
   }
-  if(g>255) 
+  if(g>255)
   {
     g=255;
   }
-  if(b>255) 
+  if(b>255)
   {
     b=255;
   }
@@ -441,6 +441,171 @@ uint8_t MeColorSensor::ColorIdentify(void)
   return result;
 }
 
+
+uint8_t MeColorSensor::IdeFISColor(void) {
+  uint8_t result,r,g,b;
+  if(MeColorSensor::ColorDataReadOnebyOne())
+  {
+    return BLACK;//id return error!
+  }
+  /*********************************/
+  if(Redvalue < 1200 && Greenvalue < 1700 && Bluevalue < 1200)
+  {
+    if(Bluevalue < Redvalue && Redvalue <= Greenvalue)
+    {
+      if((Greenvalue + Redvalue + Bluevalue >300) && (Greenvalue > 1.5*Redvalue) && (Greenvalue > Bluevalue + Bluevalue))
+      {
+        result = COLOR;
+      }
+      else if((Greenvalue > Bluevalue + Bluevalue) && (Redvalue > Bluevalue + Bluevalue) && (Redvalue +  Greenvalue + Bluevalue > 120))
+      {
+        result = COLOR;
+      }
+      else if(Redvalue > 400 && Greenvalue > 580 && Bluevalue > 320)
+      {
+        result = WHITE;
+      }
+      else
+      {
+        result = BLACK;
+      }
+    }
+    else if(Greenvalue < Redvalue && Bluevalue < Greenvalue)
+    {
+      if(Redvalue + Greenvalue + Bluevalue > 220)
+      {
+        if(Greenvalue < 2.4 * Bluevalue)
+        {
+          result = COLOR;
+        }
+
+        else if(Greenvalue >= 2.4 * Bluevalue)
+        {
+          result = COLOR;
+        }
+        else
+        {
+          result = BLACK;
+        }
+      }
+      else
+      {
+        result = BLACK;
+      }
+    }
+    else if(Greenvalue <= Bluevalue && Redvalue < Bluevalue)
+    {
+      result = COLOR;
+    }
+    else if(Redvalue <= Greenvalue && Bluevalue >= Redvalue)
+    {
+      if((Redvalue + Greenvalue + Bluevalue) > 400)
+      {
+        if(Greenvalue > 2.2 * Redvalue && Greenvalue > 2.2 * Bluevalue)
+        {
+          result = COLOR;
+        }
+        else
+        {
+          if(Redvalue < 500) {
+            result = COLOR;
+          } else {
+            result = BLACK;
+          }
+          Serial.print("r :");
+          Serial.print(Redvalue);
+          Serial.print(" g :");
+          Serial.print(Greenvalue);
+          Serial.print(" b :");
+          Serial.println(Bluevalue);
+        }
+      }
+      else
+      {
+        result = BLACK;
+      }
+    }
+    else if((Greenvalue < (Redvalue + Bluevalue)) && ((Greenvalue + Redvalue + Bluevalue) > 700))
+    {
+      result = WHITE;
+    }
+    else if((Greenvalue + Redvalue + Bluevalue) < 1000)
+    {
+      result = BLACK;
+    }
+    else
+    {
+      result = BLACK;
+    }
+  }
+  /*****************************/
+  else if(Bluevalue > Greenvalue && Bluevalue > Redvalue)
+  {
+    result = COLOR;
+  }
+  else if((Redvalue > Greenvalue) && (Greenvalue > Bluevalue) &&  (Redvalue > Greenvalue))
+  {
+    result = COLOR;
+  }
+  /****************************/
+  else
+  {
+    r = Redvalue / Colorvalue;
+    g = Greenvalue / Colorvalue;
+    b = Bluevalue / Colorvalue;
+    if(r >= 9 && g <= 4 && b <= 1)
+    {
+      result = COLOR;
+    }
+    else if(r > 10 && g <= 4 && b <= 4)
+    {
+      result = COLOR;
+    }
+    else if(r < 3 && g <= 4 && b < 3)
+    {
+      result = BLACK;
+    }
+    else if(r <= 5 && g > 10 && b < 5)
+    {
+      result = COLOR;
+    }
+    else if((r < 5 && g < 5 && b > 10) || (r <= 3 && g >= 8 && b >= 8))
+    {
+      result = COLOR;
+    }
+    else if(r >= 5 && g > 6 && b >= 7)
+    {
+      result = COLOR;
+    }
+    else if(r <= 4 && g >= 10 && b >= 6)
+    {
+      result = COLOR;
+    }
+    else if(r <= 8 && r >= 6 && g >= 6 && b < 2)
+    {
+      result = COLOR;
+    }
+    else if(r <= 8 && r <= 8 && b < 2)
+    {
+      //result = RED;
+    }
+    else if(r >= 10 && g <= 7 && b < 2)
+    {
+      result = COLOR;
+    }
+    else if(r >= 4 && g >= 9 && b >= 4)
+    {
+      result = WHITE;
+    }
+    else
+    {
+      result = WHITE;
+    }
+  }
+  return result;
+}
+
+
 /**
  * \par Function
  *   Returnresult
@@ -456,13 +621,13 @@ uint8_t MeColorSensor::ColorIdentify(void)
  *   None
  */
 
-//ORANGE : 
+//ORANGE :
 // R : entre 3400 et 3600
 // G : entre 1700 et 1900
 // B : entre 750 et 950
 
 
-//VERT : 
+//VERT :
 // R : entre 950 et 1150
 // G : enre 3300 et 3500
 // B : entre 900 et 1100
@@ -477,7 +642,7 @@ uint8_t MeColorSensor::ColorIdentify(void)
 // G : entre 3900 et 4100
 // B : entre 3700 et 3900
 
-//BLANC 
+//BLANC
 // R : entre 4150 et 4350
 // G : entre 7400 et 7600
 // B : entre 4400 et 4600
@@ -488,6 +653,15 @@ uint8_t MeColorSensor::Returnresult(void)
   uint8_t result,r,g,b;
 
   MeColorSensor::ColorDataRead();
+  Serial.print("r:");
+  Serial.print(Redvalue);
+
+  Serial.print(" g:");
+  Serial.print(Greenvalue);
+
+  Serial.print(" b:");
+  Serial.println(Bluevalue);
+  delayMicroseconds(5000);
 
   if(Redvalue > 4000 && Greenvalue > 7000 && Bluevalue > 4000){
     result = WHITE;
@@ -509,7 +683,7 @@ uint8_t MeColorSensor::Returnresult(void)
   //   {
   //       result = BLACK;
   //   }
-  //   else if(Bluevalue < Redvalue && Redvalue <= Greenvalue) 
+  //   else if(Bluevalue < Redvalue && Redvalue <= Greenvalue)
   //   {
   //       if((Greenvalue + Redvalue + Bluevalue > 300) && (Greenvalue > 1.5 * Redvalue) && (Greenvalue > Bluevalue + Bluevalue))
   //       {
@@ -624,7 +798,7 @@ uint8_t MeColorSensor::Returnresult(void)
   // }
   /***************move filter***************/
   temp[cnt_++] = result;
-  if(cnt_>=3) 
+  if(cnt_>=3)
   {
     cnt_ = 0;
   }
@@ -644,7 +818,7 @@ uint8_t MeColorSensor::Returnresult(void)
  *   return Color Grayscale value
  * \par Others
  * Gray = R*0.299 + G*0.587 + B*0.114
- * Gray = (r*38 + g*75 + b*15)>>7;  
+ * Gray = (r*38 + g*75 + b*15)>>7;
  */
 uint8_t MeColorSensor::ReturnGrayscale(void)
 {
@@ -656,7 +830,7 @@ uint8_t MeColorSensor::ReturnGrayscale(void)
   b = Bluevalue>>8;
 
   gray = (r * 38 + g * 75 + b * 15) >> 4;
-  if(gray > 255) 
+  if(gray > 255)
   {
     gray = 255;
   }
@@ -697,20 +871,20 @@ uint16_t MeColorSensor::ReturnColorhue(void)
     c = max - min;
     if(max == r)
     {
-      h = ((g-b) / c % 6)*60; 
+      h = ((g-b) / c % 6)*60;
     }
     else if(max == g)
     {
-      h = ((b-r) / c + 2) * 60; 
+      h = ((b-r) / c + 2) * 60;
     }
     else if(min == b)
     {
-      h = ((r-g) / c + 4)*60; 
+      h = ((r-g) / c + 4)*60;
     }
   }
   return h;
 }
-  
+
 /**
  * \par Function
  *   ReturnRedData
@@ -824,7 +998,7 @@ void MeColorSensor::TurnOffLight(void)
 {
   MePort::dWrite1(0);
 }
-  
+
 /**
  * \par Function
  *  TurnOffmodule
@@ -889,7 +1063,7 @@ int8_t MeColorSensor::writeReg(int16_t reg, uint8_t data)
   int8_t return_value = 0;
 
   return_value = writeData(reg, &data, 1);
-  
+
   return(return_value);
 }
 
@@ -938,18 +1112,18 @@ int8_t MeColorSensor::readData(uint8_t start, uint8_t *buffer, uint8_t size)
   delayMicroseconds(1);
   /* Third parameter is true: relase I2C-bus after data is read. */
   Wire.requestFrom(Device_Address, size, (uint8_t)true);
-  
+
   while(Wire.available() && i < size)
   {
     buffer[i++] = Wire.read();
   }
   delayMicroseconds(1);
-  
+
   if(i != size)
   {
     return(I2C_ERROR);
   }
-  return 0; 
+  return 0;
 }
 
 /**
@@ -981,14 +1155,14 @@ int8_t MeColorSensor::writeData(uint8_t start, const uint8_t *pData, uint8_t siz
 {
   int8_t return_value = 0;
   Wire.beginTransmission(Device_Address);
-  return_value = Wire.write(start); 
+  return_value = Wire.write(start);
   if(return_value != 1)
   {
       return(I2C_ERROR);
   }
-  Wire.write(pData, size);  
-  return_value = Wire.endTransmission(true); 
-  return return_value;                      
+  Wire.write(pData, size);
+  return_value = Wire.endTransmission(true);
+  return return_value;
 }
 
 /**
@@ -997,7 +1171,7 @@ int8_t MeColorSensor::writeData(uint8_t start, const uint8_t *pData, uint8_t siz
  * \par Description
  *   find the max one from r g b.
  * \param[in]
- *  r g b  
+ *  r g b
  * \par Output
  *   None
  * \return
@@ -1035,7 +1209,7 @@ uint8_t MeColorSensor::MAX(uint8_t r, uint8_t g, uint8_t b)
  * \par Description
  *   find the min one from r g b.
  * \param[in]
- *  r g b  
+ *  r g b
  * \par Output
  *   None
  * \return
@@ -1066,7 +1240,3 @@ uint8_t MeColorSensor::MIN(uint8_t r, uint8_t g, uint8_t b)
   }
   return min;
 }
-
-
-
-

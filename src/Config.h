@@ -10,10 +10,14 @@
 
 
 
+
 /*----Position gyroscope------*/
 #define FORK_UP -30.0
-#define FORK_DOWN 21
+#define FORK_DOWN 22.8
 #define FORK_COLOR_SENSOR -32.5
+
+
+#define DISTANCE_OBJECT 5
 
 
 
@@ -27,8 +31,11 @@
 
 
  #define SPEED_FORWARD_MAX 40
+ #define SPEED_FORWARD_PUT_PIECE 30
 
- #define SPEED_LINEF_MAX 40
+ #define SPEED_LINEF_MAX 28
+
+ #define SPEED_LINEF_WORKSHOP 40
 
  #define ROTATION_SPEED 40
 
@@ -42,10 +49,7 @@
 #define AUTOMATIC 2
 #define LEFT_90 3
 #define RIGHT_90 4
-#define FOLLOW_LINE_BLUE 5
-#define FOLLOW_LINE_ORANGE 6
-#define FOLLOW_LINE_GREEN 7
-#define FOLLOW_LINE_BROW 8
+#define FOLLOW_LINE_COLOR 5
 #define TAKE_PIECES_SAME_COLOR 9
 #define TAKE_PIECES 10
 #define DROP_PIECES 11

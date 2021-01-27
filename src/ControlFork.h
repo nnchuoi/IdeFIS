@@ -51,10 +51,9 @@ class ControlFork
 
     /* position up*/
     void upFork(){
-      double KP=15,KI=3,KD=0;
+      double KP=30,KI=6,KD=0;
       robot->forward(0);
       gyroscope->update();
-      Serial.read();
       gy=gyroscope->getAngleY();
       Serial.println("okok");
       error = gy - FORK_UP;
@@ -64,8 +63,6 @@ class ControlFork
       while((mm>0.01 || mm<-0.01) || (error >0.02 || error < -0.02)){
         error = gy - FORK_UP;
         meanSmooth(error, false);
-        Serial.println(error);
-        Serial.println(mm);
         sum_error += error;
         sum_error = min(sum_error, 20);
         sum_error = max(sum_error, -20);
@@ -77,7 +74,7 @@ class ControlFork
         motorFork.run(res);
         delay(10);
         gyroscope->update();
-        Serial.read();
+        //Serial.read();
         gy=gyroscope->getAngleY();
       }
       motorFork.run(0);
@@ -86,10 +83,9 @@ class ControlFork
 
     /* position to take the piece*/
     void downFork(){
-        double KP=15,KI=3,KD=0;
+        double KP=30,KI=3,KD=0;
         robot->forward(0);
         gyroscope->update();
-        Serial.read();
         gy=gyroscope->getAngleY();
         Serial.println("okok");
         error = gy - FORK_DOWN;
@@ -99,8 +95,7 @@ class ControlFork
         while((mm>0.01 || mm<-0.01) || (error >0.02 || error < -0.02)){
             error = gy - FORK_DOWN;
             meanSmooth(error, false);
-            Serial.println(error);
-            Serial.println(mm);
+
             sum_error += error;
             sum_error = min(sum_error, 20);
             sum_error = max(sum_error, -20);
@@ -120,10 +115,9 @@ class ControlFork
 
     /* gyroscope horizontal*/
     void middleFork(){
-        double KP=15,KI=3,KD=0;
+        double KP=30,KI=6,KD=0;
         robot->forward(0);
         gyroscope->update();
-        Serial.read();
         gy=gyroscope->getAngleY();
         Serial.println("okok");
         error = gy - 0;
@@ -133,8 +127,6 @@ class ControlFork
         while((mm>0.01 || mm<-0.01) || (error >0.02 || error < -0.02)){
             error = gy - 0;
             meanSmooth(error, false);
-            Serial.println(error);
-            Serial.println(mm);
             sum_error += error;
             sum_error = min(sum_error, 20);
             sum_error = max(sum_error, -20);

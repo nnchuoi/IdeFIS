@@ -31,7 +31,7 @@ MeGyro gyro(PORT_6, 0x68);
 
 
 Controlrobot robot(motor_left, motor_right);
-LineFollower lf(lineFinder);
+LineFollower lineFolowerWorshop(lineFinder, &robot);
 UltraSonicSensor ultraSonicSensor(&robot);
 
 DetectColorSensor sensorColor(colorsensor0, &robot);
@@ -79,21 +79,21 @@ void setup(){
   delay(2000);
   //robot.forward(80);
   //time1=millis();
-  //fork.downFork();
-  //delay(1000);
+  fork.downFork();
+  // delay(1000);
   delay(1000);
   fork.upFork();
-  delay(1000);
-  fork.middleFork();
-  delay(1000);
-  fork.upFork();
+  // delay(1000);
+  // fork.middleFork();
+  // delay(1000);
+  // fork.upFork();
 }
 
 
 /********************start of the loop************************/
 void loop(){
 
-  /*
+
   //-------------------------Read serial-------------------
 
   if(Serial3.available()){
@@ -108,6 +108,10 @@ void loop(){
 
    }else if(dataRecieved.toInt()==MANUEL){
      mode=1;
+     clearTabCommandes();
+
+   }else if(dataRecieved=="STOP"){
+     robot.forward(0);
      clearTabCommandes();
 
      //si on recoit une commande
@@ -136,29 +140,71 @@ commandValid=false;
 
 switch (mode){
   //automatic
-  case 2:
+  case AUTOMATIC:
     switch(tabCommandes[indexCommandes]){
-      case 3:
+      case LEFT_90:
        automaticBehavior.turnLeft90();
        commandValid=true;
        break;
 
-      case 4:
+      case RIGHT_90:
        automaticBehavior.turnRight90();
        commandValid=true;
        break;
+
+      case FOLLOW_LINE_COLOR:
+        lineFolowerWorshop.followLine();
+        commandValid=ultraSonicSensor.detectObject(DISTANCE_OBJECT);
+        if(commandValid==true){
+          Serial3.println("O");
+        }
+        while(commandValid==true){
+            commandValid=ultraSonicSensor.detectObject(DISTANCE_OBJECT);
+        }
+
+        commandValid=sensorColor.detectColor();
+        if(commandValid==true){
+          //rajouter peut être un recul du robot pour être bien sur la pastille
+        }
+        break;
+
+      case TAKE_PIECES_SAME_COLOR:
+        indexCommandes+=1;
+        automaticBehavior.takePiecesSameColor(tabCommandes[indexCommandes]);
+        commandValid=true;
+        break;
+
+      case TAKE_PIECES:
+        indexCommandes+=1;
+        automaticBehavior.takePieces(tabCommandes[indexCommandes]);
+        commandValid=true;
+        break;
+
+      case DROP_PIECES:
+        indexCommandes+=1;
+        automaticBehavior.putPieces(tabCommandes[indexCommandes]);
+        commandValid=true;
+        break;
+
+      case ENTER_REST_ZONE:
+        automaticBehavior.enterResteZone();
+        commandValid=true;
+
+      case OUT_REST_ZONE:
+        automaticBehavior.exitRestZone();
+        commandValid=true;
 
       default:
         break;
     }
   //manuel
-  case 1:
+  case MANUEL:
     switch (tabCommandes[indexCommandes]){
       case FORWARD :
-        Serial.println("forward");
+        //Serial.println("forward");
 
         indexCommandes+=1;
-        Serial.println(tabCommandes[indexCommandes]);
+        //Serial.println(tabCommandes[indexCommandes]);
         robot.forward(tabCommandes[indexCommandes]);
         commandValid=true;
         delay(DELAY_FORWARD);
@@ -196,13 +242,11 @@ switch (mode){
    // if end of tab
    if(tabCommandes[indexCommandes]==0){
      clearTabCommandes();
+     Serial3.println("A");
 
    }
  }
 
- delay(10);
- */
- automaticBehavior.takePiecesSameColor();
- delay(20000);
+
 
 }

@@ -25,6 +25,8 @@ class AutomaticBehavior
     UltraSonicSensor *ultraSonicSensor;
     ControlFork *fork;
     DetectColorPieceSensor *sensorColorPiece;
+
+    uint8_t piecesInFork;
   public :
 
 
@@ -117,7 +119,6 @@ class AutomaticBehavior
     }
 
 
-
     void enterResteZone(){
       robot->left(60);
       delay(600);
@@ -137,6 +138,8 @@ class AutomaticBehavior
       robot->forward(0);
     }
 
+
+
     void exitRestZone(){
 
       robot->left(60);
@@ -151,57 +154,183 @@ class AutomaticBehavior
 
 
 
-
-    /* take the piece in with the same colors*/
-    void  takePiecesSameColor()
+    void  takePiecesSameColor(int numberPieces)
       {
 
       uint8_t color=0;
       bool detectColor=false;
       uint8_t detectedColor;
-      uint8_t piecesTaken=0;
+      piecesInFork=0;
+      bool pieceTaken=false;
+      bool piece=false; // if piece or not
       fork->upFork();
 
-      while(1){
 
-        lineFollower->followLine();
+      while(numberPieces>0){ //////////loop for all the piece
+        pieceTaken=false;
 
-        bool piece=ultraSonicSensor->DetectPiece(8); //on détecte une pièce
-        // Serial.println(piece);
-        if (piece==true){
-          Serial.println("piece");
-          /*on met le capteur couleur à l'avant en position*/
-          delay(100);
-          fork->colorPosition();
-          color=sensorColorPiece->detectColor();//on défini la couleur couleur principale avant le première prise
+        //first alignment
+         while(piece==false){
+           lineFollower->followLine();
+            piece=ultraSonicSensor->detectPiece(8);
+         }
 
-          Serial.println(color);
-          while(color!=detectedColor && detectColor==true){
-            color=sensorColorPiece->detectColor();
-          }
+         //on fait reculer le robot pour mieux se stabiliser avec la ligne
+         robot->forward(-30);
+         delay(1500);
+         robot->forward(0);
 
-          detectedColor=color;
-          detectColor=true;//la couleur a été définie
-          Serial.println(detectedColor);
-          robot->forward(-35);
-          delay(2000);
-          fork->downFork();
-          robot->forward(35);
-          delay(580);
-          fork->upFork();
-          robot->forward(-35);
-          delay(2000);
-          robot->forward(0);
+        //méthode pour prendre la pièce
+        while(pieceTaken==false){
 
+          lineFollower->followLine();
+          piece=ultraSonicSensor->detectPiece(8); //on détecte une pièce
+          // Serial.println(piece);
+          if (piece==true){
+            Serial.println("piece");
+            /*on met le capteur couleur à l'avant en position*/
+            delay(100);
+            fork->middleFork();
+            fork->colorPosition();
+            color=sensorColorPiece->detectColor();//on défini la couleur couleur principale avant le première prise
+
+            Serial.println(color);
+            while(color!=detectedColor && detectColor==true){
+              color=sensorColorPiece->detectColor();
+              //if the color of the piece is different, we stop the fonction : the number of remaining pieces=0
+              if (detectedColor==true && ((detectedColor==GREEN && color==RED) || (detectedColor==RED && color==GREEN))) {
+                numberPieces=0;
+              }
+            }
+
+            detectedColor=color;
+            detectColor=true;//la couleur a été définie
+            Serial.println(detectedColor);
+            robot->forward(-35);
+            delay(2000);
+            fork->downFork();
+            robot->forward(35);
+            delay(520);
+            fork->upFork();
+            robot->forward(-35);
+            delay(2000);
+            robot->forward(0);
+
+            pieceTaken=true;
+            numberPieces-=1;
+            piecesInFork+=1;
         }
       }
 
-
-      //Serial3.println(couleur+nb)
       robot->forward(-SPEED_FORWARD_MAX);
       delay(1000);
       robot->forward(0);
+      //send to IHM
+      Serial3.println("A_"+String(piecesInFork)+"_"+String(detectedColor));
     }
+    /* take the piece in with the same colors*/
+  }
+  //--------------------------------------------------------------------//
+
+
+
+
+  //------take pieces without checking color----------------//
+    void  takePieces(int numberPieces){
+
+      uint8_t color=0;
+      piecesInFork=0;
+      bool pieceTaken=false;
+      bool piece=false; // if piece or not
+      fork->upFork();
+
+
+      while(numberPieces>0){ //////////loop for all the piece
+        pieceTaken=false;
+
+        //first alignment
+         while(piece==false){
+           lineFollower->followLine();
+            piece=ultraSonicSensor->detectPiece(8);
+         }
+
+         //on fait reculer le robot pour mieux se stabiliser avec la ligne
+         robot->forward(-30);
+         delay(1500);
+         robot->forward(0);
+
+        //méthode pour prendre la pièce
+        while(pieceTaken==false){
+
+          lineFollower->followLine();
+          piece=ultraSonicSensor->detectPiece(8); //on détecte une pièce
+          // Serial.println(piece);
+          if (piece==true){
+            Serial.println("piece");
+            /*on met le capteur couleur à l'avant en position*/
+            delay(100);
+            fork->middleFork();
+            fork->colorPosition();
+            color=sensorColorPiece->detectColor();//on défini la couleur couleur principale avant le première prise
+            robot->forward(-35);
+            delay(2000);
+            fork->downFork();
+            robot->forward(35);
+            delay(520);
+            fork->upFork();
+            robot->forward(-35);
+            delay(2000);
+            robot->forward(0);
+            pieceTaken=true;
+            numberPieces-=1;
+            piecesInFork+=1;
+        }
+      }
+
+      robot->forward(-SPEED_FORWARD_MAX);
+      delay(1000);
+      robot->forward(0);
+      //send to IHM
+      Serial3.println("A_"+String(piecesInFork));
+    }
+
+  }
+
+
+  ////////////////A CORRIGER AUJOURD'HUI
+    void putPieces(int numberPiecesInZone){
+
+      robot->forward(SPEED_FORWARD_PUT_PIECE);
+
+      //position of robot to in the zone
+      switch(numberPiecesInZone){
+        case 0:
+          delay(2000);
+          break;
+
+        case 1:
+          delay(1800);
+          break;
+
+        case 2:
+          delay(1600);
+          break;
+
+        default:
+          delay(1500);
+          break;
+
+      }
+
+      fork->downFork();
+      robot->forward(-30);
+      delay(1400);
+      fork->upFork();
+
+      Serial3.println("P_"+String());
+    }
+
+
 
 
 

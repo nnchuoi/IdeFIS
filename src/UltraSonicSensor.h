@@ -21,15 +21,7 @@ class UltraSonicSensor
 
   UltraSonicSensor (Controlrobot *r):robot{r}{}
 
-    void DetectObject(int distance, Controlrobot *robot){
-      //Serial.println(ultraSensor.distanceCm());
-      while(ultraSensor.distanceCm()<=distance){
-        robot->forward(0);
-      }
-
-
-      }
-    bool DetectPiece(int distance){
+    bool detectObject(int distance){
 
       /*timer of 100ms*/
       detectPieceTime=millis();
@@ -37,7 +29,29 @@ class UltraSonicSensor
 
         detectPieceInitialTime=millis();
         detectPieceTime=0;
-        
+
+        if(ultraSensor.distanceCm()<=distance){
+          robot->forward(0);
+          return true;
+        }
+
+        return false;
+
+      }else{
+        detectPieceTime=0;
+      }
+    }
+
+    
+    bool detectPiece(int distance){
+
+      /*timer of 100ms*/
+      detectPieceTime=millis();
+      if ((detectPieceTime-detectPieceInitialTime)>=100){
+
+        detectPieceInitialTime=millis();
+        detectPieceTime=0;
+
 
         if (ultraSensor.distanceCm()<=distance){
 

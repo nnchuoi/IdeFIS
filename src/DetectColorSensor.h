@@ -22,13 +22,14 @@ class DetectColorSensor
       colorsensor0=colorsensor;
     };
 
-    bool detectColor(int color){
+    bool detectColor(){
+
 
       colorResult=colorsensor0.ColorIdentify();
       Serial.println("couleur:");
       Serial.println(colorResult);
 
-      if (colorResult==color){
+      if (colorResult==2){
         return true;
 
       }

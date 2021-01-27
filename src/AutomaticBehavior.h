@@ -7,6 +7,8 @@
 #include "UltraSonicSensor.h"
 #include "ControlFork.h"
 #include "DetectColorPieceSensor.h"
+#include "LineFollower.h"
+#include "DetectColorSensor.h"
 #include <math.h>
 
 
@@ -25,19 +27,23 @@ class AutomaticBehavior
     UltraSonicSensor *ultraSonicSensor;
     ControlFork *fork;
     DetectColorPieceSensor *sensorColorPiece;
+    LineFollower *lineFolowerWorshop;
+    DetectColorSensor *sensorColorWorkshop;
 
     uint8_t piecesInFork;
   public :
 
 
 
-    AutomaticBehavior(MeGyro *gyro, Controlrobot *r, TrueLineFollower *lf, UltraSonicSensor *us, ControlFork * f, DetectColorPieceSensor *scp){
+    AutomaticBehavior(MeGyro *gyro, Controlrobot *r, TrueLineFollower *lf, UltraSonicSensor *us, ControlFork * f, DetectColorPieceSensor *scp, LineFollower *lfw, DetectColorSensor *scw ){
       gyroscope=gyro;
       robot=r;
       lineFollower=lf;
       ultraSonicSensor=us;
       fork=f;
       sensorColorPiece=scp;
+      lineFolowerWorshop=lfw;
+      sensorColorWorkshop=scw;
     };
 
     void turnLeft90(){
@@ -141,14 +147,34 @@ class AutomaticBehavior
 
 
     void exitRestZone(){
+      fork->upFork();
+      robot->left(40);
+      delay(300);
 
-      robot->left(60);
-      delay(250);
-      robot->forward(40);
+
+
+      while(sensorColorWorkshop->detectWhiteBlack()!=true){
+        lineFolowerWorshop->followLine(30);
+
+      }
+
+      while(sensorColorWorkshop->detectColor()!=true){
+        lineFolowerWorshop->followLine(30);
+      }
+
+      robot->forward(0);
+
+
+      /*
       delay(3500);
       robot->right(60);
-      delay(250);
+      delay(280);
       robot->forward(0);
+      delay(200);
+      robot->forward(30);
+      delay(300);
+      robot->forward(0);
+      */
     }
 
 
@@ -168,7 +194,7 @@ class AutomaticBehavior
 
       while(numberPieces>0){ //////////loop for all the piece
         pieceTaken=false;
-
+        piece=false;
         //first alignment
          while(piece==false){
            lineFollower->followLine();
@@ -190,7 +216,7 @@ class AutomaticBehavior
             Serial.println("piece");
             /*on met le capteur couleur à l'avant en position*/
             delay(100);
-            fork->middleFork();
+            //fork->middleFork();
             fork->colorPosition();
             color=sensorColorPiece->detectColor();//on défini la couleur couleur principale avant le première prise
 
@@ -213,7 +239,7 @@ class AutomaticBehavior
             delay(520);
             fork->upFork();
             robot->forward(-35);
-            delay(2000);
+            delay(400);
             robot->forward(0);
 
             pieceTaken=true;
@@ -305,19 +331,35 @@ class AutomaticBehavior
       //position of robot to in the zone
       switch(numberPiecesInZone){
         case 0:
-          delay(2000);
+          delay(3300);
+          fork->downFork();
+          robot->forward(-30);
+          delay(3300);
+          fork->upFork();
           break;
 
         case 1:
-          delay(1800);
+          delay(2300);
+          fork->downFork();
+          robot->forward(-30);
+          delay(2300);
+          fork->upFork();
           break;
 
         case 2:
-          delay(1600);
+          delay(1300);
+          fork->downFork();
+          robot->forward(-30);
+          delay(1300);
+          fork->upFork();
           break;
 
         default:
-          delay(1500);
+          delay(1300);
+          fork->downFork();
+          robot->forward(-30);
+          delay(1300);
+          fork->upFork();
           break;
 
       }
@@ -327,7 +369,7 @@ class AutomaticBehavior
       delay(1400);
       fork->upFork();
 
-      Serial3.println("P_"+String());
+      Serial3.println("A_"+String());
     }
 
 

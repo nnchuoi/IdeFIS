@@ -38,7 +38,7 @@ DetectColorSensor sensorColor(colorsensor0, &robot);
 DetectColorPieceSensor sensorColorPiece(colorsensor1, &robot);
 ControlFork fork(motorFork, &gyro, &robot);
 TrueLineFollower trueLineFollower(lineFinder, &robot);
-AutomaticBehavior automaticBehavior(&gyro,&robot, &trueLineFollower, &ultraSonicSensor, &fork, &sensorColorPiece);
+AutomaticBehavior automaticBehavior(&gyro,&robot, &trueLineFollower, &ultraSonicSensor, &fork, &sensorColorPiece, &lineFolowerWorshop, &sensorColor);
 
 unsigned long time1=0;
 unsigned long time2=0;
@@ -79,10 +79,10 @@ void setup(){
   delay(2000);
   //robot.forward(80);
   //time1=millis();
-  fork.downFork();
+  //fork.downFork();
   // delay(1000);
-  delay(1000);
-  fork.upFork();
+  //delay(1000);
+  //fork.upFork();
   // delay(1000);
   // fork.middleFork();
   // delay(1000);
@@ -153,7 +153,7 @@ switch (mode){
        break;
 
       case FOLLOW_LINE_COLOR:
-        lineFolowerWorshop.followLine();
+        lineFolowerWorshop.followLine(40);
         commandValid=ultraSonicSensor.detectObject(DISTANCE_OBJECT);
         if(commandValid==true){
           Serial3.println("O");
@@ -246,6 +246,15 @@ switch (mode){
 
    }
  }
+
+
+
+
+
+
+
+
+
 
 
 

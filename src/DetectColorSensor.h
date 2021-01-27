@@ -14,6 +14,8 @@ class DetectColorSensor
   private :
     uint8_t colorResult;
     Controlrobot *robot;
+    unsigned long detectColorInitialTime=0;
+    unsigned long detectColorTime=0;
   public :
 
 
@@ -25,15 +27,35 @@ class DetectColorSensor
     bool detectColor(){
 
 
-      colorResult=colorsensor0.ColorIdentify();
-      Serial.println("couleur:");
-      Serial.println(colorResult);
+      detectColorTime=millis();
+      if ((detectColorTime-detectColorInitialTime)>=0){
 
-      if (colorResult==2){
-        return true;
-
+        detectColorInitialTime=millis();
+        detectColorTime=0;
+        colorResult=colorsensor0.IdeFISColor();
+        if (colorResult==12){
+          return true;
+        }
+        return false;
+      }else{
+        detectColorTime=0;
       }
-      return false;
+    }
+
+    bool detectWhiteBlack(){
+      detectColorTime=millis();
+      if ((detectColorTime-detectColorInitialTime)>=0){
+
+        detectColorInitialTime=millis();
+        detectColorTime=0;
+        colorResult=colorsensor0.IdeFISColor();
+        if (colorResult!=12){
+          return true;
+        }
+        return false;
+      }else{
+        detectColorTime=0;
+      }
     }
 
 };

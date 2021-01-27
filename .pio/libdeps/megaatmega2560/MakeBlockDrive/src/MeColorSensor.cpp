@@ -287,17 +287,16 @@ long MeColorSensor::ReturnColorCode(void)
 uint8_t MeColorSensor::ColorIdentify(void)
 {
   uint8_t result,r,g,b;
-  
   if(MeColorSensor::ColorDataReadOnebyOne())
   {
     return BLACK;//id return error!
   }
   /*********************************/
-  if(Redvalue > 200 && Redvalue < 300 && Greenvalue > 250 && Greenvalue < 350 && Bluevalue < 1000){
+  if(Redvalue > 200 && Redvalue < 1200 && Greenvalue > 250 && Greenvalue < 1250 && Bluevalue < 1000){
     result = BROWN;
   }else if(Redvalue < 1200 && Greenvalue < 1700 && Bluevalue < 1200)
   {
-    if(Bluevalue < Redvalue && Redvalue <= Greenvalue)  
+    if(Bluevalue < Redvalue && Redvalue <= Greenvalue)
     {
       if((Greenvalue + Redvalue + Bluevalue >300) && (Greenvalue > 1.5*Redvalue) && (Greenvalue > Bluevalue + Bluevalue))
       {
@@ -316,7 +315,7 @@ uint8_t MeColorSensor::ColorIdentify(void)
         result = BLACK;
       }
     }
-    else if(Greenvalue < Redvalue && Bluevalue < Greenvalue)  
+    else if(Greenvalue < Redvalue && Bluevalue < Greenvalue)
     {
       if(Redvalue + Greenvalue + Bluevalue > 220)
       {
@@ -324,7 +323,7 @@ uint8_t MeColorSensor::ColorIdentify(void)
         {
           result = RED;
         }
-        
+
         else if(Greenvalue >= 2.4 * Bluevalue)
         {
           result = RED;
@@ -375,7 +374,7 @@ uint8_t MeColorSensor::ColorIdentify(void)
     }
   }
   /*****************************/
-  else if(Bluevalue > Greenvalue && Bluevalue > Redvalue) 
+  else if(Bluevalue > Greenvalue && Bluevalue > Redvalue)
   {
     result = BLUE;
   }
@@ -467,7 +466,12 @@ uint8_t MeColorSensor::IdeFISColor(void) {
       }
       else
       {
-        result = BLACK;
+        //result = BLACK;
+        if (Redvalue >= 200 && Greenvalue >= 200) {
+          result = COLOR; ///BROWN
+        } else {
+          result = BLACK;
+        }
       }
     }
     else if(Greenvalue < Redvalue && Bluevalue < Greenvalue)
@@ -508,16 +512,10 @@ uint8_t MeColorSensor::IdeFISColor(void) {
         else
         {
           if(Redvalue < 500) {
-            result = COLOR;
+            result = COLOR; /// BLUE
           } else {
             result = BLACK;
           }
-          Serial.print("r :");
-          Serial.print(Redvalue);
-          Serial.print(" g :");
-          Serial.print(Greenvalue);
-          Serial.print(" b :");
-          Serial.println(Bluevalue);
         }
       }
       else

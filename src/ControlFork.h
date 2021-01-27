@@ -15,21 +15,21 @@ class ControlFork
 {
   private:
     double error, prev_error, sum_error, d_error, res;
-    double mu_error[10];
+    double mu_error[4];
     int last = 0;
     double mm=0;
     void meanSmooth(double sample, boolean reset){
         if(reset){
-            for (int i = 0; i < 8; ++i) {
+            for (int i = 0; i < 4; ++i) {
                 mu_error[i] = 0;
             }
-            last = 7;
+            last = 3;
             mm = 0;
         }
         mm = mm + sample - mu_error[last];
         mu_error[last] = sample;
         last++;
-        if(last == 8){
+        if(last == 4){
             last = 0;
         }
 
@@ -51,7 +51,7 @@ class ControlFork
 
     /* position up*/
     void upFork(){
-      double KP=30,KI=6,KD=0;
+      double KP=40,KI=2,KD=0;
       robot->forward(0);
       gyroscope->update();
       gy=gyroscope->getAngleY();
@@ -69,8 +69,8 @@ class ControlFork
         d_error = error - prev_error;
         prev_error = error;
         res = KP*error + KI * sum_error + KD*d_error;
-        res = min(res, 80);
-        res = max(res, -80);
+        res = min(res, 100);
+        res = max(res, -100);
         motorFork.run(res);
         delay(10);
         gyroscope->update();
@@ -83,7 +83,7 @@ class ControlFork
 
     /* position to take the piece*/
     void downFork(){
-        double KP=30,KI=3,KD=0;
+        double KP=40,KI=2,KD=0;
         robot->forward(0);
         gyroscope->update();
         gy=gyroscope->getAngleY();
@@ -102,8 +102,8 @@ class ControlFork
             d_error = error - prev_error;
             prev_error = error;
             res = KP*error + KI * sum_error + KD*d_error;
-            res = min(res, 80);
-            res = max(res, -80);
+            res = min(res, 100);
+            res = max(res, -100);
             motorFork.run(res);
             delay(10);
             gyroscope->update();
@@ -115,7 +115,7 @@ class ControlFork
 
     /* gyroscope horizontal*/
     void middleFork(){
-        double KP=30,KI=6,KD=0;
+        double KP=40,KI=2,KD=0;
         robot->forward(0);
         gyroscope->update();
         gy=gyroscope->getAngleY();
@@ -133,8 +133,8 @@ class ControlFork
             d_error = error - prev_error;
             prev_error = error;
             res = KP*error + KI * sum_error + KD*d_error;
-            res = min(res, 80);
-            res = max(res, -80);
+            res = min(res, 100);
+            res = max(res, -100);
             motorFork.run(res);
             delay(10);
             gyroscope->update();
@@ -148,24 +148,35 @@ class ControlFork
 
 
     void colorPosition(){
+      double KP=40,KI=2,KD=0;
       robot->forward(0);
       gyroscope->update();
       gy=gyroscope->getAngleY();
-      Serial.println(gy);
+      Serial.println("okok");
+      error = gy - FORK_COLOR_SENSOR;
+      prev_error = 0.0;
+      meanSmooth(error, true);
+
+      while((mm>0.01 || mm<-0.01) || (error >0.02 || error < -0.02)){
+          error = gy - FORK_COLOR_SENSOR;
+          meanSmooth(error, false);
+          sum_error += error;
+          sum_error = min(sum_error, 20);
+          sum_error = max(sum_error, -20);
+          d_error = error - prev_error;
+          prev_error = error;
+          res = KP*error + KI * sum_error + KD*d_error;
+          res = min(res, 100);
+          res = max(res, -100);
+          motorFork.run(res);
+          delay(10);
+          gyroscope->update();
+          Serial.read();
+          gy=gyroscope->getAngleY();
+      }
 
 
-      while(gy<(FORK_COLOR_SENSOR)){
-        motorFork.run(-50);
-        delay(10);
-        gyroscope->update();
-        gy=gyroscope->getAngleY();
-      }
-      while(gy>(FORK_COLOR_SENSOR)){
-        motorFork.run(50);
-        delay(10);
-        gyroscope->update();
-        gy=gyroscope->getAngleY();
-      }
+
 
       motorFork.run(0);
     }
